@@ -8,6 +8,9 @@ const assignmentschema = new mongoose.Schema({
     },
     file:{
         type:String
+    },
+    name:{
+        type:String
     }
 },{timestamps:true})
 

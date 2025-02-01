@@ -51,33 +51,35 @@ app.get('/',(req,res)=>{
     })
 })
 
-app.post('/user/register',async(req,res)=>{
-    try {
-        const {name} = req.body;
-        const user = await User.create({
-            name
-        })
-        res.status(200).json({
-            user,message:"user created successfully"
-        })
-    } catch (error) {
-        res.status(500).json({
-            message:"internal server error"
-        })
-        console.log(error)
-    }
+// app.post('/user/register',async(req,res)=>{
+//     try {
+//         const {name} = req.body;
+//         const user = await User.create({
+//             name
+//         })
+//         res.status(200).json({
+//             user,message:"user created successfully"
+//         })
+//     } catch (error) {
+//         res.status(500).json({
+//             message:"internal server error"
+//         })
+//         console.log(error)
+//     }
     
-})
+// })
 
 app.post('/user/upload',upload.single("contribute"),async(req,res)=>{
     try {
-        console.log(req.body);
         const cloud = await uploadResult(req.file.path)
         const cldurl = cloud.url;
+        console.log(req.body);
         const assignment = await Assignment.create({
             subject:req.body.subject,
-            file:cldurl
+            file:cldurl,
+            name:req.body.name
         })
+        console.log("Assignment to be stored in DB:", assignment);
         res.status(200).json({
             assignment,
             message:"file successfully submitted"
@@ -94,15 +96,15 @@ app.post('/user/upload',upload.single("contribute"),async(req,res)=>{
 app.get('/user/:id', async (req, res) => {
     try {
         const userId = req.params.id;
-        const dsafiles = await Assignment.aggregate([
+        const files = await Assignment.aggregate([
             {
                 $match: {
                     subject: userId
                 }
             }
         ]);
-        console.log(dsafiles);
-        res.status(200).json(dsafiles);
+        console.log(files);
+        res.status(200).json(files);
     } catch (error) {
         console.error('Error fetching data:', error);
         res.status(500).send('An error occurred while fetching data.');
